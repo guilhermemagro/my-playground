@@ -22,7 +22,9 @@ fun AppNavigation() {
         startDestination = Screen.Home.route
     ) {
         composable(route = Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(onNavigationClick = { route ->
+                navController.navigate(route)
+            })
         }
         composable(route = Screen.CircularNavBar.route) {
             val circularNavBarViewModel: CircularNavBarViewModel = hiltViewModel()

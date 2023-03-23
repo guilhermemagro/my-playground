@@ -12,7 +12,8 @@ import com.guilhermemagro.myplayground.ui.components.ListItemView
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigationClick: ((String) -> Unit)? = null,
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -21,7 +22,10 @@ fun HomeScreen(
         state = lazyListState,
     ) {
         items(Screen.allComponentScreens()) {
-            ListItemView(title = it.title)
+            ListItemView(
+                title = it.title,
+                onClick = { onNavigationClick?.invoke(it.route) }
+            )
         }
     }
 }
