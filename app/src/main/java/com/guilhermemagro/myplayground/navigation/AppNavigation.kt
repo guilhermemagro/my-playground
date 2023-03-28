@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.guilhermemagro.myplayground.ui.screens.CircularNavBarScreen
+import com.guilhermemagro.myplayground.ui.screens.ClockSplittingAnimationScreen
 import com.guilhermemagro.myplayground.ui.screens.HomeScreen
 import com.guilhermemagro.myplayground.viewmodels.CircularNavBarViewModel
 
@@ -29,6 +30,9 @@ fun AppNavigation() {
         composable(route = Screen.CircularNavBar.route) {
             val circularNavBarViewModel: CircularNavBarViewModel = hiltViewModel()
             CircularNavBarScreen()
+        }
+        composable(route = Screen.ClockSplittingAnimation.route) {
+            ClockSplittingAnimationScreen()
         }
     }
 }
