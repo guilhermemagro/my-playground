@@ -11,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -21,45 +22,50 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-private fun calculateClockHandLength(stepHeight: Float, currentHour: Int): Float {
-    // Height decreases first 360 deg, then increases again
-    val stepsNumber = if (currentHour < 12) {
-        11 - currentHour
-    } else {
-        currentHour - 12
-    }
-    return stepHeight * stepsNumber
-}
-
-private fun calculateAssembleDistance(stepHeight: Float, currentHour: Int): Float =
-    stepHeight * (23 - currentHour)
-
 @Composable
 fun ClockAnimated(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.Black,
-    duration: Int = 6000,
+    animationAngle: Float = 0f
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
+    fun calculateClockHandLength(stepHeight: Float, currentHour: Int): Float {
+        // Height decreases first 360 deg, then increases again
+        val stepsNumber = if (currentHour < 12) {
+            11 - currentHour
+        } else {
+            currentHour - 12
+        }
+        return stepHeight * stepsNumber
+    }
 
-    // Creates a child animation of float type as a part of the [InfiniteTransition].
-    val animationAngle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 720f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = duration, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
+    fun calculateAssembleDistance(stepHeight: Float, currentHour: Int): Float =
+        stepHeight * (23 - currentHour)
+
+    val dotsPositions = remember(animationAngle) {
+        List(12) { currentDot ->
+            val easing = LinearOutSlowInEasing
+            val degreeLimit = 45f
+            // currentDot is an index of the dot
+            val startAngle = currentDot * 30f
+            val currentDeg = (animationAngle - startAngle).coerceIn(0f, degreeLimit)
+            // Progression from 0 to 1
+            val progression = currentDeg/degreeLimit
+            easing.transform(progression)
+        }
+    }
 
     // Start calculation each time the animationAngle changes.
     val assembleValue = remember(animationAngle) {
@@ -75,9 +81,6 @@ fun ClockAnimated(
     var currentHour by remember { mutableStateOf(0) }
 
     val currentHourChannel = remember { Channel<Int>(12, BufferOverflow.DROP_OLDEST) }
-    val currentHourFlow = remember(currentHourChannel) {
-        currentHourChannel.receiveAsFlow()
-    }
 
     LaunchedEffect(animationAngle) {
         // Add hour calculation inside of a launchEffect
@@ -90,28 +93,6 @@ fun ClockAnimated(
     }
 
     val hours = remember { List(12) { it } }
-
-    val disassembleAnimations = remember { hours.map { Animatable(1f) } }
-
-    // Assume that duration is 1/12th of the whole duration, which equals to the length of 2 hours.
-    // It can be longer or shorter if necessary
-    val disassembleDuration = duration / 12
-
-    LaunchedEffect(currentHourFlow) {
-        currentHourFlow.collectLatest {
-            // Launch each animation asynchronously
-            launch {
-                if (currentHour < 12) {
-                    disassembleAnimations[currentHour].snapTo(0f)
-                    // Set a tween spec with LinearOutSlowInEasing
-                    disassembleAnimations[currentHour].animateTo(
-                        1f,
-                        tween(durationMillis = disassembleDuration, easing = LinearOutSlowInEasing)
-                    )
-                }
-            }
-        }
-    }
 
     val dotsVisibility = remember(currentHour) {
         hours.map { hour ->
@@ -127,6 +108,7 @@ fun ClockAnimated(
 
     Spacer(modifier = modifier
         .fillMaxSize()
+        .padding(8.dp)
         .background(backgroundColor)
         // Set strokeWidth based on the size of the viewport
         .onGloballyPositioned {
@@ -136,7 +118,7 @@ fun ClockAnimated(
             val halfWidth = size.width / 2
             val halfHeight = size.height / 2
             val halfStroke = strokeWidth / 2
-            val stepHeight = halfHeight / 12
+            val stepHeight = (halfHeight - strokeWidth) / 12
 
             val center = Offset(x = halfWidth, y = halfHeight)
             val endOffset = Offset(
@@ -152,6 +134,8 @@ fun ClockAnimated(
                     start = center,
                     end = endOffset,
                     strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round,
+                    blendMode = BlendMode.DstOut,
                 )
 
                 // Drawing a clock hand piece
@@ -159,13 +143,15 @@ fun ClockAnimated(
                     val positionY = halfStroke +
                             calculateAssembleDistance(stepHeight, currentHour) * assembleValue
 
-                    val start = Offset(halfWidth, positionY - halfStroke)
+                    val start = Offset(halfWidth, positionY)
                     val end = Offset(halfWidth, positionY + halfStroke)
                     drawLine(
                         color = Color.White,
                         start = start,
                         end = end,
                         strokeWidth = strokeWidth,
+                        cap = StrokeCap.Round,
+                        blendMode = BlendMode.DstOut,
                     )
                 }
             }
@@ -176,9 +162,9 @@ fun ClockAnimated(
                 rotate(degree) {
                     // Based on the hour value, the travel distance will be longer
                     val positionY = halfStroke +
-                            stepHeight * hour * (1 - disassembleAnimations[hour].value)
+                            stepHeight * hour * (1 - dotsPositions[hour])
 
-                    val start = Offset(x = halfWidth, y = positionY - halfStroke)
+                    val start = Offset(x = halfWidth, y = positionY)
                     val end = Offset(x = halfWidth, y = positionY + halfStroke)
 
                     drawLine(
@@ -186,8 +172,22 @@ fun ClockAnimated(
                         start = start,
                         end = end,
                         strokeWidth = strokeWidth,
+                        cap = StrokeCap.Round,
+                        blendMode = BlendMode.DstOut,
                     )
                 }
+            }
+
+            // Rotation of the gradient
+            rotate(degrees = animationAngle / 2, pivot = center) {
+                drawRect(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color.Red, Color.Yellow, Color.Green, Color.Blue, Color.Magenta
+                        )
+                    ),
+                    blendMode = BlendMode.DstAtop,
+                )
             }
         }
     )
