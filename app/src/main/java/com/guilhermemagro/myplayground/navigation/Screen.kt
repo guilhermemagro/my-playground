@@ -2,6 +2,8 @@ package com.guilhermemagro.myplayground.navigation
 
 sealed class Screen(val title: String, val route: String) {
     object Home : Screen(title = "Home", route = "home")
+
+    // https://www.youtube.com/watch?v=4zyuGXTyZ80
     object CircularNavBar : Screen(title = "CircularNavBar", route = "circularnavbar")
 
     // https://proandroiddev.com/amazing-clock-animation-with-jetpack-compose-part-1-8d143f38a3cd
