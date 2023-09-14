@@ -10,9 +10,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Enum Tab Cases
- * Raw Value: Asset Image Name
  */
-enum class Tab(val title: String, val image: ImageVector) {
+enum class Tab(val title: String, val icon: ImageVector) {
     PLAY("Play", Icons.Filled.SportsEsports),
     EXPLORE("Explore", Icons.Filled.RocketLaunch),
     STORE("PS Store", Icons.Filled.ShoppingBag),
