@@ -2,7 +2,6 @@ package com.guilhermemagro.myplayground.ui.components.circularnavbar.view
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -16,8 +15,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -31,7 +31,12 @@ fun CustomTabBar(
     modifier: Modifier = Modifier,
 ) {
     val iconOffsetUnit = 10
-    fun offset(tab: Tab): Dp {
+
+    val backgroundTopColor = MaterialTheme.colors.surface.copy(alpha = 0.8f)
+    val backgroundBottomColor = MaterialTheme.colors.surface.copy(alpha = 0.5f)
+    val borderStrokeColor = MaterialTheme.colors.onSurface
+
+    fun getIconOffset(tab: Tab): Dp {
         val totalIndices = Tab.values().size
         val currentIndex = tab.ordinal
         val progress = currentIndex / totalIndices.toFloat()
@@ -45,29 +50,45 @@ fun CustomTabBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = Color.Red)
-            .padding(top = 12.dp, bottom = 40.dp),
+            .padding(top = 12.dp),
     ) {
         Canvas(
             modifier = modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(50.dp)
         ) {
             drawPath(
-                path = Path().let {
-                    it.moveTo(0f, 5f.dp.toPx())
-                    it.relativeQuadraticBezierTo(
+                path = Path().apply {
+                    moveTo(0f, 5f.dp.toPx())
+                    relativeQuadraticBezierTo(
                         dx1 = size.width / 2,
                         dy1 = (iconOffsetUnit * -4f).dp.toPx(),
                         dx2 = size.width,
                         dy2 = 0f
                     )
-                    it.lineTo(size.width, size.height)
-                    it.lineTo(0f, size.height)
-                    it.close()
-                    it
+                    lineTo(size.width, size.height)
+                    lineTo(0f, size.height)
+                    close()
                 },
-                color = Color.Green
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        backgroundTopColor,
+                        backgroundBottomColor
+                    )
+                ),
+            )
+            drawPath(
+                path = Path().apply {
+                    moveTo(0f, 5f.dp.toPx())
+                    relativeQuadraticBezierTo(
+                        dx1 = size.width / 2,
+                        dy1 = (iconOffsetUnit * -4f).dp.toPx(),
+                        dx2 = size.width,
+                        dy2 = 0f
+                    )
+                },
+                color = borderStrokeColor,
+                style = Stroke(),
             )
         }
 
@@ -83,7 +104,7 @@ fun CustomTabBar(
                     tint = MaterialTheme.colors.onSurface,
                     modifier = Modifier
                         .size(30.dp)
-                        .offset(y = offset(it)),
+                        .offset(y = getIconOffset(it)),
                 )
             }
         }
