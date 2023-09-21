@@ -15,7 +15,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +38,7 @@ fun CustomTabBar(
     val backgroundBottomColor = MaterialTheme.colors.surface.copy(alpha = 0.5f)
     val borderStrokeColor = MaterialTheme.colors.onSurface
 
+    // TODO: Recalculate icon offset using math equations
     fun getIconOffset(tab: Tab): Dp {
         val totalIndices = Tab.values().size
         val currentIndex = tab.ordinal
@@ -50,16 +53,17 @@ fun CustomTabBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 12.dp),
+            .padding(top = 20.dp),
     ) {
         Canvas(
             modifier = modifier
                 .fillMaxWidth()
                 .height(50.dp)
         ) {
+            // Top surface
             drawPath(
                 path = Path().apply {
-                    moveTo(0f, 5f.dp.toPx())
+                    moveTo(0f, 0f)
                     relativeQuadraticBezierTo(
                         dx1 = size.width / 2,
                         dy1 = (iconOffsetUnit * -4f).dp.toPx(),
@@ -77,6 +81,7 @@ fun CustomTabBar(
                     )
                 ),
             )
+            // Border line
             drawPath(
                 path = Path().apply {
                     moveTo(0f, 5f.dp.toPx())
@@ -89,6 +94,14 @@ fun CustomTabBar(
                 },
                 color = borderStrokeColor,
                 style = Stroke(),
+            )
+            // Bottom surface
+            val circleWidth = size.width * 5
+            val circleRadius = circleWidth / 2
+            drawCircle(
+                color = Color.Red,
+                radius = circleRadius,
+                center = Offset(size.width / 2, size.height + circleRadius - 20.dp.toPx())
             )
         }
 
