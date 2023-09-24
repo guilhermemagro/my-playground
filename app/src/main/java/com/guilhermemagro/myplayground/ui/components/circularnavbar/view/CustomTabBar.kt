@@ -15,7 +15,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -25,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.guilhermemagro.myplayground.ui.components.circularnavbar.model.Tab
 import com.guilhermemagro.myplayground.ui.theme.MyPlaygroundTheme
 
-// Stopped at https://youtu.be/4zyuGXTyZ80?si=gZZV3FjtVlp2Zoyt&t=251
+// Stopped at https://youtu.be/4zyuGXTyZ80?si=tRWg1sZ1VkuFFhxt&t=480
 @Composable
 fun CustomTabBar(
     activeTab: Tab,
@@ -36,11 +38,11 @@ fun CustomTabBar(
     val backgroundTopColor = MaterialTheme.colors.surface.copy(alpha = 0.8f)
     val backgroundBottomColor = MaterialTheme.colors.surface.copy(alpha = 0.5f)
     val backgroundSurfaceColor = MaterialTheme.colors.surface
-    val borderStrokeColor = MaterialTheme.colors.onSurface
+    val onSurfaceColor = MaterialTheme.colors.onSurface
 
     // TODO: Recalculate icon offset using math equations
     fun getIconOffset(tab: Tab): Dp {
-        return when(tab.ordinal) {
+        return when (tab.ordinal) {
             0, 4 -> 0.dp
             1, 3 -> (-10).dp
             2 -> (-15).dp
@@ -97,8 +99,18 @@ fun CustomTabBar(
                         dy2 = 0f
                     )
                 },
-                color = borderStrokeColor,
+                color = onSurfaceColor,
                 style = Stroke(),
+            )
+            // Tab marker
+            drawRoundRect(
+                color = onSurfaceColor,
+                topLeft = Offset(
+                    x = size.width / 2 - 45.dp.toPx() / 2,
+                    y = (iconOffsetUnit * 2f).dp.toPx() + 2.dp.toPx()
+                ),
+                size = Size(width = 45.dp.toPx(), height = 4.dp.toPx()),
+                cornerRadius = CornerRadius(2.dp.toPx()),
             )
             // Bottom surface
             val circleWidth = size.width * 5
@@ -108,6 +120,7 @@ fun CustomTabBar(
                 radius = circleRadius,
                 center = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
             )
+
         }
 
         Row(
