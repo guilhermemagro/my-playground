@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,19 +35,25 @@ fun CustomTabBar(
 
     val backgroundTopColor = MaterialTheme.colors.surface.copy(alpha = 0.8f)
     val backgroundBottomColor = MaterialTheme.colors.surface.copy(alpha = 0.5f)
+    val backgroundSurfaceColor = MaterialTheme.colors.surface
     val borderStrokeColor = MaterialTheme.colors.onSurface
 
     // TODO: Recalculate icon offset using math equations
     fun getIconOffset(tab: Tab): Dp {
-        val totalIndices = Tab.values().size
-        val currentIndex = tab.ordinal
-        val progress = currentIndex / totalIndices.toFloat()
-        return if (progress < 0.5) {
-            (currentIndex * -iconOffsetUnit).dp
-        } else {
-            ((totalIndices - currentIndex - 1) * -iconOffsetUnit).dp
+        return when(tab.ordinal) {
+            0, 4 -> 0.dp
+            1, 3 -> (-10).dp
+            2 -> (-15).dp
+            else -> (-0).dp
         }
     }
+//    val totalIndices = Tab.values().size
+//        val iconPosition = currentIndex / totalIndices.toFloat()
+//        return if (iconPosition < 0.5) {
+//            (currentIndex * -iconOffsetUnit).dp
+//        } else {
+//            ((totalIndices - currentIndex - 1) * -iconOffsetUnit).dp
+//        }
 
     Box(
         modifier = modifier
@@ -84,7 +89,7 @@ fun CustomTabBar(
             // Border line
             drawPath(
                 path = Path().apply {
-                    moveTo(0f, 5f.dp.toPx())
+                    moveTo(0f, 0f)
                     relativeQuadraticBezierTo(
                         dx1 = size.width / 2,
                         dy1 = (iconOffsetUnit * -4f).dp.toPx(),
@@ -99,9 +104,9 @@ fun CustomTabBar(
             val circleWidth = size.width * 5
             val circleRadius = circleWidth / 2
             drawCircle(
-                color = Color.Red,
+                color = backgroundSurfaceColor,
                 radius = circleRadius,
-                center = Offset(size.width / 2, size.height + circleRadius - 20.dp.toPx())
+                center = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
             )
         }
 
