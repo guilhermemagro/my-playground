@@ -21,11 +21,14 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.guilhermemagro.myplayground.ui.components.circularnavbar.model.Tab
 import com.guilhermemagro.myplayground.ui.theme.MyPlaygroundTheme
+import kotlin.math.PI
+import kotlin.math.atan
 
 // Stopped at https://youtu.be/4zyuGXTyZ80?si=tRWg1sZ1VkuFFhxt&t=480
 @Composable
@@ -56,6 +59,24 @@ fun CustomTabBar(
 //        } else {
 //            ((totalIndices - currentIndex - 1) * -iconOffsetUnit).dp
 //        }
+
+    fun calculateRotation(circleRadius: Float, viewWidth: Float, isInitial: Boolean): Float {
+        val tabWidth = viewWidth / Tab.values().size
+        // Calculating rotating from middle
+        val firstTabPositionX = -(viewWidth - tabWidth) / 2
+        val tan = circleRadius.toDouble() / firstTabPositionX.toDouble()
+        val radians = atan(tan)
+        val degrees = radians * 180 / PI
+
+        if (isInitial) return -(degrees + 90).toFloat()
+
+        val x = (-(viewWidth - tabWidth) / 2) + tabWidth * activeTab.ordinal
+        val tan2 = circleRadius.toDouble() / x.toDouble()
+        val radians2 = atan(tan2)
+        val degrees2 = radians2 * 180 / PI
+
+        return -(degrees2 - 90).toFloat()
+    }
 
     Box(
         modifier = modifier
@@ -88,6 +109,7 @@ fun CustomTabBar(
                     )
                 ),
             )
+
             // Border line
             drawPath(
                 path = Path().apply {
@@ -102,25 +124,31 @@ fun CustomTabBar(
                 color = onSurfaceColor,
                 style = Stroke(),
             )
+
             // Tab marker
-            drawRoundRect(
-                color = onSurfaceColor,
-                topLeft = Offset(
-                    x = size.width / 2 - 45.dp.toPx() / 2,
-                    y = (iconOffsetUnit * 2f).dp.toPx() + 2.dp.toPx()
-                ),
-                size = Size(width = 45.dp.toPx(), height = 4.dp.toPx()),
-                cornerRadius = CornerRadius(2.dp.toPx()),
-            )
-            // Bottom surface
             val circleWidth = size.width * 5
             val circleRadius = circleWidth / 2
+            rotate(
+                degrees = calculateRotation(circleRadius = circleRadius, viewWidth = size.width, isInitial = false),
+                pivot = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
+            ) {
+                drawRoundRect(
+                    color = onSurfaceColor,
+                    topLeft = Offset(
+                        x = size.width / 2 - 45.dp.toPx() / 2,
+                        y = (iconOffsetUnit * 2f).dp.toPx() + 2.dp.toPx()
+                    ),
+                    size = Size(width = 45.dp.toPx(), height = 4.dp.toPx()),
+                    cornerRadius = CornerRadius(2.dp.toPx()),
+                )
+            }
+
+            // Bottom surface
             drawCircle(
                 color = backgroundSurfaceColor,
                 radius = circleRadius,
                 center = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
             )
-
         }
 
         Row(
