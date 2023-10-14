@@ -12,9 +12,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * Enum Tab Cases
  */
 enum class Tab(val title: String, val icon: ImageVector) {
-    PLAY("Play", Icons.Filled.SportsEsports),
-    EXPLORE("Explore", Icons.Filled.RocketLaunch),
-    STORE("PS Store", Icons.Filled.ShoppingBag),
-    LIBRARY("Game Library", Icons.Filled.ViewModule),
-    SEARCH("Search", Icons.Filled.Search)
+    ZERO_PLAY("Play", Icons.Filled.SportsEsports),
+    ONE_EXPLORE("Explore", Icons.Filled.RocketLaunch),
+    TWO_STORE("PS Store", Icons.Filled.ShoppingBag),
+    THREE_LIBRARY("Game Library", Icons.Filled.ViewModule),
+    FOUR_SEARCH("Search", Icons.Filled.Search)
 }

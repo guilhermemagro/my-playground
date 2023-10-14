@@ -21,7 +21,7 @@ fun CircularNavBarScreen() {
             .fillMaxSize()
             .background(color = MaterialTheme.colors.background)
     ) {
-        CustomTabBar(activeTab = Tab.PLAY)
+        CustomTabBar(activeTab = Tab.ZERO_PLAY)
     }
 }
 

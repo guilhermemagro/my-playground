@@ -27,10 +27,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.guilhermemagro.myplayground.ui.components.circularnavbar.model.Tab
 import com.guilhermemagro.myplayground.ui.theme.MyPlaygroundTheme
-import kotlin.math.PI
+import java.lang.Math.toDegrees
 import kotlin.math.atan
 
-// Stopped at https://youtu.be/4zyuGXTyZ80?si=tRWg1sZ1VkuFFhxt&t=480
+// Stopped at https://youtu.be/4zyuGXTyZ80?si=GdySkdOz-qMM4wUg&t=654
 @Composable
 fun CustomTabBar(
     activeTab: Tab,
@@ -60,22 +60,40 @@ fun CustomTabBar(
 //            ((totalIndices - currentIndex - 1) * -iconOffsetUnit).dp
 //        }
 
-    fun calculateRotation(circleRadius: Float, viewWidth: Float, isInitial: Boolean): Float {
+    fun calculateRotation(circleRadius: Float, viewWidth: Float): Float {
         val tabWidth = viewWidth / Tab.values().size
         // Calculating rotating from middle
+        // SOLUTION 1
+//        val selectedTabPosition = tabWidth * activeTab.ordinal
+//        val tan = selectedTabPosition.toDouble() / circleRadius.toDouble()
+//        val radians = atan(tan)
+//        val degrees = toDegrees(radians)
+//
+//        val middleTabPositionX = (viewWidth - tabWidth) / 2
+//        val middleToFirstPosTan = middleTabPositionX.toDouble() / circleRadius.toDouble()
+//        val middleToFirstPosRad = atan(middleToFirstPosTan)
+//        val middleToFirstPosDeg = toDegrees(middleToFirstPosRad)
+//
+//        val finalDegrees = degrees - middleToFirstPosDeg
+//        return finalDegrees.toFloat()
+        // END SOLUTION 1
+
         val firstTabPositionX = -(viewWidth - tabWidth) / 2
-        val tan = circleRadius.toDouble() / firstTabPositionX.toDouble()
-        val radians = atan(tan)
-        val degrees = radians * 180 / PI
-
-        if (isInitial) return -(degrees + 90).toFloat()
-
-        val x = (-(viewWidth - tabWidth) / 2) + tabWidth * activeTab.ordinal
+        val x = firstTabPositionX + tabWidth * activeTab.ordinal
         val tan2 = circleRadius.toDouble() / x.toDouble()
         val radians2 = atan(tan2)
-        val degrees2 = radians2 * 180 / PI
+        val degrees2 = toDegrees(radians2)
 
-        return -(degrees2 - 90).toFloat()
+        return if (degrees2 < 0) {
+            -(degrees2 + 90).toFloat()
+        } else {
+            -(degrees2 - 90).toFloat()
+        }
+
+
+//        val x = tabWidth * activeTab.ordinal - middleTabPositionX
+
+//        return -(degrees2 + 90).toFloat()
     }
 
     Box(
@@ -129,7 +147,7 @@ fun CustomTabBar(
             val circleWidth = size.width * 5
             val circleRadius = circleWidth / 2
             rotate(
-                degrees = calculateRotation(circleRadius = circleRadius, viewWidth = size.width, isInitial = false),
+                degrees = calculateRotation(circleRadius = circleRadius, viewWidth = size.width),
                 pivot = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
             ) {
                 drawRoundRect(
@@ -177,6 +195,6 @@ fun CustomTabBar(
 @Composable
 fun CustomTabBarPreview() {
     MyPlaygroundTheme {
-        CustomTabBar(activeTab = Tab.LIBRARY)
+        CustomTabBar(activeTab = Tab.FOUR_SEARCH)
     }
 }
