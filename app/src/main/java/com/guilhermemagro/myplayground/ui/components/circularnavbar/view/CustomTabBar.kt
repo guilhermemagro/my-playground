@@ -56,32 +56,10 @@ fun CustomTabBar(
             else -> (-0).dp
         }
     }
-//    val totalIndices = Tab.values().size
-//        val iconPosition = currentIndex / totalIndices.toFloat()
-//        return if (iconPosition < 0.5) {
-//            (currentIndex * -iconOffsetUnit).dp
-//        } else {
-//            ((totalIndices - currentIndex - 1) * -iconOffsetUnit).dp
-//        }
 
     fun calculateRotation(circleRadius: Float, viewWidth: Float): Float {
         val tabWidth = viewWidth / Tab.values().size
         // Calculating rotating from middle
-        // SOLUTION 1
-//        val selectedTabPosition = tabWidth * activeTab.ordinal
-//        val tan = selectedTabPosition.toDouble() / circleRadius.toDouble()
-//        val radians = atan(tan)
-//        val degrees = toDegrees(radians)
-//
-//        val middleTabPositionX = (viewWidth - tabWidth) / 2
-//        val middleToFirstPosTan = middleTabPositionX.toDouble() / circleRadius.toDouble()
-//        val middleToFirstPosRad = atan(middleToFirstPosTan)
-//        val middleToFirstPosDeg = toDegrees(middleToFirstPosRad)
-//
-//        val finalDegrees = degrees - middleToFirstPosDeg
-//        return finalDegrees.toFloat()
-        // END SOLUTION 1
-
         val firstTabPositionX = -(viewWidth - tabWidth) / 2
         val x = firstTabPositionX + tabWidth * activeTab.ordinal
         val tan2 = circleRadius.toDouble() / x.toDouble()
@@ -93,11 +71,6 @@ fun CustomTabBar(
         } else {
             -(degrees2 - 90).toFloat()
         }
-
-
-//        val x = tabWidth * activeTab.ordinal - middleTabPositionX
-
-//        return -(degrees2 + 90).toFloat()
     }
 
     Box(
