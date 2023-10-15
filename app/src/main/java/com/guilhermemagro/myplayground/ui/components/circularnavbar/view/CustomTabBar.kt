@@ -1,6 +1,7 @@
 package com.guilhermemagro.myplayground.ui.components.circularnavbar.view
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,7 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -34,6 +38,9 @@ import java.lang.Math.toDegrees
 import kotlin.math.atan
 
 // Stopped at https://youtu.be/4zyuGXTyZ80?si=GdySkdOz-qMM4wUg&t=654
+
+// Probably will have to use `derivedStateOf()` to show/hide the CustomTabBar
+// https://developer.android.com/jetpack/compose/side-effects#derivedstateof
 @Composable
 fun CustomTabBar(
     activeTab: Tab,
@@ -46,6 +53,12 @@ fun CustomTabBar(
     val backgroundBottomColor = MaterialTheme.colors.surface.copy(alpha = 0.5f)
     val backgroundSurfaceColor = MaterialTheme.colors.surface
     val onSurfaceColor = MaterialTheme.colors.onSurface
+
+    var rotation by remember { mutableStateOf(0f) }
+    val currentRotation: Float by animateFloatAsState(
+        targetValue = rotation,
+        label = "currentRotation"
+    )
 
     // TODO: Recalculate icon offset using math equations
     fun getIconOffset(tab: Tab): Dp {
@@ -123,8 +136,10 @@ fun CustomTabBar(
             // Tab marker
             val circleWidth = size.width * 5
             val circleRadius = circleWidth / 2
+            rotation = calculateRotation(circleRadius = circleRadius, viewWidth = size.width)
+
             rotate(
-                degrees = calculateRotation(circleRadius = circleRadius, viewWidth = size.width),
+                degrees = currentRotation,
                 pivot = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
             ) {
                 drawRoundRect(
