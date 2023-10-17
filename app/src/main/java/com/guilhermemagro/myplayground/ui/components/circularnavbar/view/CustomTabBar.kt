@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,7 +90,7 @@ fun CustomTabBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 20.dp),
+            .padding(top = 20.dp, bottom = 8.dp),
     ) {
         Canvas(
             modifier = modifier
@@ -184,6 +185,12 @@ fun CustomTabBar(
                 )
             }
         }
+
+        Text(
+            text = activeTab.title,
+            color = MaterialTheme.colors.onSurface,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
