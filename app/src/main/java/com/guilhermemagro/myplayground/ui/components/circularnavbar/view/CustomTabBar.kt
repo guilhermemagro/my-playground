@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -119,7 +120,7 @@ fun CustomTabBar(
                 ),
             )
 
-            // Border line
+            // Top border line
             drawPath(
                 path = Path().apply {
                     moveTo(0f, 0f)
@@ -143,6 +144,18 @@ fun CustomTabBar(
                 degrees = currentRotation,
                 pivot = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
             ) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        radius = 80.dp.toPx() / 2,
+                        colors = listOf(Color(0xFF2e5778), Color.Transparent)
+                    ),
+                    radius = 80.dp.toPx() / 2,
+                    center = Offset(
+                        x = size.width / 2,
+                        y = (iconOffsetUnit * 2f).dp.toPx() + 2.dp.toPx()
+                    ),
+                )
+
                 drawRoundRect(
                     color = onSurfaceColor,
                     topLeft = Offset(
@@ -159,6 +172,14 @@ fun CustomTabBar(
                 color = backgroundSurfaceColor,
                 radius = circleRadius,
                 center = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx())
+            )
+
+            // Bottom border line
+            drawCircle(
+                color = onSurfaceColor,
+                radius = circleRadius,
+                center = Offset(size.width / 2, size.height + circleRadius - 25.dp.toPx()),
+                style = Stroke(),
             )
         }
 
