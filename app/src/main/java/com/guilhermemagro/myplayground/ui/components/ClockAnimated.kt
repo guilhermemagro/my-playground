@@ -180,7 +180,7 @@ fun ClockAnimated(
 
             // Rotation of the gradient
             rotate(degrees = animationAngle / 2, pivot = center) {
-                drawRect(
+                drawCircle(
                     brush = Brush.linearGradient(
                         colors = listOf(
                             Color.Red, Color.Yellow, Color.Green, Color.Blue, Color.Magenta
